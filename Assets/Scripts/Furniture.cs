@@ -1,10 +1,27 @@
 using UnityEngine;
 using System.Collections.Generic;
+using UnityEngine.InputSystem;
 
 public class Furniture : MonoBehaviour
 {
     [SerializeField]
     List<FurniturePiece> pieces;
+
+
+    InputAction acceptAction;
+    void Start()
+    {
+        acceptAction = InputSystem.actions.FindAction("Test");
+    }
+
+    void Update()
+    {
+        if (acceptAction.triggered)
+        {
+            Debug.Log("yaya");
+            CheckBuilt();
+        }
+    }
 
     bool CheckPieces()
     {
@@ -13,6 +30,8 @@ public class Furniture : MonoBehaviour
 
     bool CheckStable()
     {
+        gameObject.AddComponent<Rigidbody>();
+
         return true;
     }
 

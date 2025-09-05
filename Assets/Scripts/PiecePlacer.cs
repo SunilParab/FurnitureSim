@@ -6,10 +6,12 @@ public class PiecePlacer : MonoBehaviour
 
     public FurniturePiece curPiece;
     InputAction interactAction;
+    InputAction shiftAction;
 
     void Start()
     {
         interactAction = InputSystem.actions.FindAction("Attack");
+        shiftAction = InputSystem.actions.FindAction("Sprint");
     }
 
     public Vector3 FindPos()
@@ -29,13 +31,60 @@ public class PiecePlacer : MonoBehaviour
         if (curPiece != null)
         {
             Vector3 newPos = FindPos();
-            newPos += new Vector3(0, curPiece.halfHeight, 0);
-            curPiece.transform.position = newPos;
+
+            if (shiftAction.IsPressed())
+            {
+                curPiece.transform.position = new Vector3(newPos.x,curPiece.transform.position.y,newPos.z);
+            }
+            else
+            {
+                newPos += new Vector3(0, curPiece.size.y / 2, 0);
+                curPiece.transform.position = newPos;
+            }
         }
 
-        if (interactAction.IsPressed()) {
-            curPiece = null;
+        if (interactAction.triggered) {
+            if (curPiece != null)
+            {
+                curPiece.Place();
+                curPiece = null;
+            }
+            else
+            {
+                curPiece = Pickup();
+                if (curPiece != null)
+                {
+                    curPiece.Pickup();
+                }
+            }
         }
+
+    }
+
+    public FurniturePiece Pickup()
+    {
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+
+        RaycastHit info;
+
+        Physics.Raycast(ray, out info, 1000);
+
+        if (info.collider.gameObject.CompareTag("Piece"))
+        {
+            FurniturePiece reference = info.collider.GetComponent<FurniturePiece>();
+
+            if (reference.moveable) {
+                return reference;
+            } else {
+                return null;
+            }
+        }
+        else
+        {
+            return null;
+        }
+
+        
 
     }
 
