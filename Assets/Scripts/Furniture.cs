@@ -1,38 +1,22 @@
 using UnityEngine;
 using System.Collections.Generic;
-using UnityEngine.InputSystem;
 
 public class Furniture : MonoBehaviour
 {
     [SerializeField]
-    List<FurniturePiece> pieces;
+    public List<FurniturePiece> pieces = new List<FurniturePiece>();
 
-
-    InputAction acceptAction;
-    void Start()
-    {
-        acceptAction = InputSystem.actions.FindAction("Test");
-    }
-
-    void Update()
-    {
-        if (acceptAction.triggered)
-        {
-            Debug.Log("yaya");
-            CheckBuilt();
-        }
-    }
+    public bool active;
 
     bool CheckPieces()
     {
         return true; //Check for necessary pieces (like a table that needs a monitor stand)
+        //No longer used
     }
 
     bool CheckStable()
     {
-        gameObject.AddComponent<Rigidbody>();
-
-        return true;
+        return GetComponent<Rigidbody>().linearVelocity.magnitude < 1;
     }
 
     public virtual bool CheckBuilt()
@@ -40,9 +24,28 @@ public class Furniture : MonoBehaviour
         return CheckPieces() && CheckStable();
     }
 
+    public void Activate()
+    {
+        active = true;
+        gameObject.AddComponent<Rigidbody>();
+    }
+
     public void Merge(Furniture other)
     {
-        
+        for (int i = 0; i < other.pieces.Count; i++)
+        {
+            AddPiece(other.pieces[i]);
+        }
+        Destroy(other.gameObject);
+    }
+
+    void AddPiece(FurniturePiece newPiece)
+    {
+        newPiece.transform.SetParent(transform, true);
+        newPiece.tempParent = this;
+        newPiece.moveable = false;
+        Debug.Log(pieces.Count);
+        pieces.Add(newPiece);
     }
 
 }

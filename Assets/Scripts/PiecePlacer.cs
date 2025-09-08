@@ -25,19 +25,32 @@ public class PiecePlacer : MonoBehaviour
         return info.point;
     }
 
+    public Vector3 FindPosHeightless()
+    {
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+
+        RaycastHit info;
+
+        Physics.Raycast(ray, out info, 1000, LayerMask.GetMask("Ground"));
+
+        return info.point;
+    }
+
     void Update()
     {
 
         if (curPiece != null)
         {
-            Vector3 newPos = FindPos();
+            Vector3 newPos;
 
             if (shiftAction.IsPressed())
             {
-                curPiece.transform.position = new Vector3(newPos.x,curPiece.transform.position.y,newPos.z);
+                newPos = FindPosHeightless();
+                curPiece.transform.position = new Vector3(newPos.x,curPiece.transform.position.y,newPos.z);;
             }
             else
             {
+                newPos = FindPos();
                 newPos += new Vector3(0, curPiece.size.y / 2, 0);
                 curPiece.transform.position = newPos;
             }
